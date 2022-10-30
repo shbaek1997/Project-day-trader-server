@@ -5,6 +5,8 @@ import {
   Post,
   UseGuards,
   Request,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { LocalAuthGuard } from 'src/auth/local-auth.gurard';
 import * as bcrypt from 'bcrypt';
@@ -37,16 +39,34 @@ export class UserController {
     //user를 이메일 validation또한 넣을까?
     const isEmailValid = foundUser === null ? true : false;
     if (!isEmailValid) {
-      throw Error('An account already exists with your email address');
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'An account already exists with your email address',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const isPasswordValid = password.length >= 8;
     if (!isPasswordValid) {
-      throw Error('Password should be at least 8 characters!');
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Password should be at least 8 characters!',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     //단계 2. password와 confirmPassword가 같은지 확인, 비밀번호 길이 수를 확인
     const isPasswordEqual = password === confirmPassword;
     if (!isPasswordEqual) {
-      throw Error('Password and repeat password do not match');
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Password and repeat password do not match',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
     //단계 3. password를 bcrypt같은 것을 활용하여 암호화
     const saltRounds = 10;
