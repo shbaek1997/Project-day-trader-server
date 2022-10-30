@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { LocalAuthGuard } from 'src/auth/local-auth.gurard';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/CreateUser.dto';
@@ -7,6 +15,12 @@ export class UserController {
   constructor(private userService: UserService) {}
   @Get()
   getUsers() {}
+
+  @UseGuards(LocalAuthGuard)
+  @Post('/login')
+  async login(@Request() req) {
+    return req.user;
+  }
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
