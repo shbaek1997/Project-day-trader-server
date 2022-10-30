@@ -10,11 +10,10 @@ import { LocalAuthGuard } from 'src/auth/local-auth.gurard';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/CreateUser.dto';
+import { AuthenticatedGuard } from 'src/auth/authenticated.guard';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-  @Get()
-  getUsers() {}
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
@@ -22,6 +21,12 @@ export class UserController {
     return req.user;
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @Get('/protected')
+  getUserId(@Request() req) {
+    const { id, nickname } = req.user;
+    return { id, nickname };
+  }
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto) {
     //DTO에서 detailParams로 convert 해야함
