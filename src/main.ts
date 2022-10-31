@@ -7,6 +7,7 @@ import * as SessionFileStore from 'session-file-store';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const FileStore = SessionFileStore(session);
+  app.enableCors();
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
