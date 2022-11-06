@@ -23,13 +23,31 @@ export class UserController {
     return req.user;
   }
 
+  @Get('/logout')
+  logout(@Request() req) {
+    //session destroy도 고려해보기..
+    req.logout((err: Error) => {
+      if (err) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: 'An error occured loggin out',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    });
+    return { message: 'user session ended' };
+  }
+
   @UseGuards(AuthenticatedGuard)
   @Get('/protected')
-  getUserId(@Request() req) {
-    const { id, nickname } = req.user;
-    return { id, nickname };
+  async getUserId(@Request() req) {
+    const { email } = req.user;
+    const foundUser = await this.userService.findUserByEmail(email);
+    return foundUser;
   }
-  @Post()
+  @Post('/signup')
   async createUser(@Body() createUserDto: CreateUserDto) {
     //DTO에서 detailParams로 convert 해야함
     const { email, nickname, password, confirmPassword } = createUserDto;
